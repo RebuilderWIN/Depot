@@ -1,8 +1,16 @@
+#---
+# Excerpted from "Agile Web Development with Rails, 4rd Ed.",
+# published by The Pragmatic Bookshelf.
+# Copyrights apply to this code. It may not be used to create training material, 
+# courses, books, articles, and the like. Contact us if you are in doubt.
+# We make no guarantees that this code is fit for any purpose. 
+# Visit http://www.pragmaticprogrammer.com/titles/rails4 for more book information.
+#---
 require 'test_helper'
 
 class ProductTest < ActiveSupport::TestCase
-  # Replace this with your real tests.
-    test "product attributes must not be empty" do
+  fixtures :products
+  test "product attributes must not be empty" do
     product = Product.new
     assert product.invalid?
     assert product.errors[:title].any?
@@ -10,7 +18,8 @@ class ProductTest < ActiveSupport::TestCase
     assert product.errors[:price].any?
     assert product.errors[:image_url].any?
   end
-   test "product price must be positive" do
+
+  test "product price must be positive" do
     product = Product.new(:title       => "My Book Title",
                           :description => "yyy",
                           :image_url   => "zzz.jpg")
@@ -49,4 +58,25 @@ class ProductTest < ActiveSupport::TestCase
     end
   end
 
+  test "product is not valid without a unique title" do
+    product = Product.new(:title       => products(:ruby).title,
+                          :description => "yyy", 
+                          :price       => 1, 
+                          :image_url   => "fred.gif")
+
+    assert !product.save
+    assert_equal "has already been taken", product.errors[:title].join('; ')
+  end
+
+  test "product is not valid without a unique title - i18n" do
+    product = Product.new(:title       => products(:ruby).title,
+                          :description => "yyy", 
+                          :price       => 1, 
+                          :image_url   => "fred.gif")
+
+    assert !product.save
+    assert_equal I18n.translate('activerecord.errors.messages.taken'),
+                 product.errors[:title].join('; ')
+  end
+  
 end
