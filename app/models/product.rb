@@ -27,6 +27,8 @@ class Product < ActiveRecord::Base
     :message => 'must be a URL for GIF, JPG or PNG image.'
   }
   validates :title, :length => {:minimum => 10}
+  
+  
   private
 
     # ensure that there are no line items referencing this product
